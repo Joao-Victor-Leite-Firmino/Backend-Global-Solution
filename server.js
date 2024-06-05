@@ -13,8 +13,10 @@ db.serialize(() => {
 app.use(express.json());
 
 app.post('/locations', (req, res) => {
-    const { name } = req.body;
-    const { risk } = req.body;
+    const { name, risk } = req.body;
+    if (!name || !risk) {
+        return res.status(400).json({ error: 'Nome e risco são obrigatórios!' });
+    }
     db.run("INSERT INTO locations (name, risk) VALUES (?, ?)", [name, risk], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -32,7 +34,6 @@ app.get('/locations', (req, res) => {
     });
 });
 
-
 app.get('/locations/:id', (req, res) => {
     const { id } = req.params;
     db.get("SELECT * FROM locations WHERE id = ?", [id], (err, row) => {
@@ -49,8 +50,28 @@ app.get('/locations/:id', (req, res) => {
 
 app.put('/locations/:id', (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
-    db.run("UPDATE locations SET local = ? WHERE id = ?", [name, id], function(err) {
+    const { name, risk } = req.body;
+    if (!name && !risk) {
+        return res.status(400).json({ error: 'Nome ou risco devem ser fornecidos para atualização!' });
+    }
+    
+    const updateFields = [];
+    const updateValues = [];
+    
+    if (name) {
+        updateFields.push("name = ?");
+        updateValues.push(name);
+    }
+    if (risk) {
+        updateFields.push("risk = ?");
+        updateValues.push(risk);
+    }
+    
+    updateValues.push(id);
+    
+    const query = `UPDATE locations SET ${updateFields.join(", ")} WHERE id = ?`;
+    
+    db.run(query, updateValues, function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -76,7 +97,6 @@ app.delete('/locations/:id', (req, res) => {
     });
 });
 
-// Inicie o servidor Express
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta http://localhost:${PORT}`);
 });
