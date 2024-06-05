@@ -6,7 +6,6 @@ const PORT = 3000;
 
 const db = new sqlite3.Database('locations.db');
 
-// Criar a tabela 'tarefas' no banco de dados
 db.serialize(() => {
     db.run("CREATE TABLE IF NOT EXISTS locations ( id INTEGER PRIMARY KEY, name TEXT, risk TEXT);");
 });
@@ -14,12 +13,13 @@ db.serialize(() => {
 app.use(express.json());
 
 app.post('/locations', (req, res) => {
-    const { local } = req.body;
-    db.run("INSERT INTO locations (local) VALUES (?)", [local], function(err) {
+    const { name } = req.body;
+    const { risk } = req.body;
+    db.run("INSERT INTO locations (name, risk) VALUES (?, ?)", [name, risk], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.status(201).json({ id: this.lastID, local });
+        res.status(201).json({ id: this.lastID, name, risk });
     });
 });
 
