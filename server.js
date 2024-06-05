@@ -15,37 +15,7 @@ app.use(express.json());
 
 app.post('/locations', (req, res) => {
     const { local } = req.body;
-    db.run("INSERT INTO locations (name, risk) VALUES ('Rio Pinheiros', 'Emergência');", [local], function(err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: this.lastID, local });
-    });
-});
-
-app.post('/locations', (req, res) => {
-    const { local } = req.body;
-    db.run("INSERT INTO locations (name, risk) VALUES ('Rio Tiete', 'Alto risco');", [local], function(err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: this.lastID, local });
-    });
-});
-
-app.post('/locations', (req, res) => {
-    const { local } = req.body;
-    db.run("INSERT INTO locations (name, risk) VALUES ('Rio Aricanduva', 'Médio risco');", [local], function(err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: this.lastID, local });
-    });
-});
-
-app.post('/locations', (req, res) => {
-    const { local } = req.body;
-    db.run("INSERT INTO locations (name, risk) VALUES ('Rio Tamanduateí', 'Baixo risco');", [local], function(err) {
+    db.run("INSERT INTO locations (local) VALUES (?)", [local], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
